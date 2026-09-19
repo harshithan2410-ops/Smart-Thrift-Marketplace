@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up - Thriftify</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.12.0/toastify.min.css">
+  <style>
+    /* Global Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f7f7f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .signup-container {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 500px;
+      padding: 30px;
+      margin: 40px 0;
+    }
+    
+    .signup-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .signup-header h1 {
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    
+    .signup-header p {
+      color: #7f8c8d;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #2c3e50;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 5px rgba(52,152,219,0.3);
+    }
+
+    .form-group input.error {
+      border-color: #ff5f6d;
+      box-shadow: 0 0 5px rgba(255, 95, 109, 0.3);
+    }
+    
+    .error-message {
+      color: #ff5f6d;
+      font-size: 0.8rem;
+      margin-top: 5px;
+    }
+
+    .file-input {
+      margin-top: 10px;
+    }
+    
+    .submit-btn {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 12px 15px;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+      transition: all 0.3s;
+    }
+    
+    .submit-btn:hover {
+      background: #2980b9;
+      transform: translateY(-2px);
+    }
+    
+    .login-link {
+      text-align: center;
+      margin-top: 20px;
+      color: #7f8c8d;
+    }
+    
+    .login-link a {
+      color: #3498db;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+    
+    .home-link {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: #2c3e50;
+      text-decoration: none;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+    }
+    
+    .home-link i {
+      margin-right: 5px;
+    }
+
+    /* Toast Styles */
+    .toastify {
+      padding: 12px 20px;
+      color: white;
+      display: inline-block;
+      box-shadow: 0 3px 6px -1px rgba(0, 0, 0, 0.12);
+      background: linear-gradient(to right, #00b09b, #96c93d);
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      z-index: 9999;
+    }
+    
+    .toastify.error {
+      background: linear-gradient(to right, #ff5f6d, #ffc371);
+    }
+  </style>
+</head>
+<body>
+  <a href="/" class="home-link">
+    <i class="fas fa-home"></i> Back to Home
+  </a>
+  
+  <div id="toast-container"></div>
+  
+  <div class="signup-container">
+    <div class="signup-header">
+      <h1>Create an Account</h1>
+      <p>Join Thriftify and start buying & selling today</p>
+    </div>
+    
+    <form action="/api/v1/user/signup" method="POST" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="fullname">Full Name</label>
+        <input  type="text" id="fullname" name="fullname" placeholder="Enter your full name" required >
+      </div>
+      
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="Choose a username" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Create a password" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="confirm_password">Confirm Password</label>
+        <input type="password" id="confirm_password" name="confirmPassword" placeholder="Confirm your password" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="profilepic">Profile Picture</label>
+        <input type="file" id="profilepic" name="profilepic" accept="image/*" class="file-input" required>
+      </div>
+      
+      <button type="submit" class="submit-btn">Create Account</button>
+    </form>
+    
+    <div class="login-link">
+      <p>Already have an account? <a href="/api/v1/user/login">Sign In</a></p>
+    </div>
+  </div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.12.0/toastify.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.querySelector('form');
+      
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Password confirmation validation
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm_password').value;
+        
+        if (password !== confirmPassword) {
+          showToast('Passwords do not match', 'error');
+          return;
+        }
+        
+        // Form data submission
+        const formData = new FormData(form);
+        
+        fetch('/api/v1/user/signup', {
+          method: 'POST',
+          body: formData,
+          redirect: 'follow'
+        })
+        .then(response => {
+          try {
+            if (response.ok) {
+              showToast('Account created successfully! Redirecting...', 'success');
+              setTimeout(() => {
+                window.location.href = '/api/v1/user/login';
+              }, 2000);
+            } else if (response.redirected) {
+              window.location.href = response.url;
+            } else {
+              console.log("Response status:", response.status);
+              
+              // Handle different error status codes
+              if(response.status === 409 || response.status === 400) {
+                // Clone response before parsing
+                response.clone().json()
+                  .then(data => {
+                    console.log("Error data:", data);
+                    
+                    // Handle validation errors (could be an array of errors or a single message)
+                    if (data && data.errors && Array.isArray(data.errors)) {
+                      // Display each validation error as a separate toast
+                      data.errors.forEach(err => {
+                        showToast(err.message || err, 'error');
+                      });
+                      
+                      // Highlight fields with errors
+                      highlightInvalidFields(data.errors);
+                    } else if (data && data.message) {
+                      // Single error message
+                      showToast(data.message, 'error');
+                    } else {
+                      // Fallback if no message in response
+                      showToast('Invalid input. Please check your information and try again.', 'error');
+                    }
+                  })
+                  .catch(err => {
+                    console.log('Could not parse response as JSON:', err);
+                    showToast('An error occurred validating your information.', 'error');
+                  });
+              } else {
+                response.text().then(text => {
+                  try {
+                    const data = JSON.parse(text);
+                    showToast(data.message || 'Failed to create account', 'error');
+                  } catch (e) {
+                    showToast('Failed to create account', 'error');
+                  }
+                }).catch(() => {
+                  showToast('An error occurred. Please try again.', 'error');
+                });
+              }
+            }
+          } catch (error) {
+            showToast('An error occurred. Please try again.', 'error');
+            console.log(error);
+            console.error('Error:', error.message);
+          }
+        })
+        .catch(error => {
+          showToast('An error occurred. Please try again.', 'error');
+          console.log('Error:', error);
+          console.error('Error:', error.message);
+        });
+      });
+      
+      // Function to show toast notifications
+      function showToast(message, type = 'success') {
+        Toastify({
+          text: message,
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "right",
+          className: type,
+          stopOnFocus: true
+        }).showToast();
+      }
+      
+      // Function to highlight fields with validation errors
+      function highlightInvalidFields(errors) {
+        // First, reset all fields to normal state
+        const allInputs = document.querySelectorAll('input');
+        allInputs.forEach(input => {
+          input.classList.remove('error');
+          
+          // Remove any existing error message
+          const errorMsg = input.parentNode.querySelector('.error-message');
+          if (errorMsg) errorMsg.remove();
+        });
+        
+        // Map validation errors to form fields
+        errors.forEach(error => {
+          const fieldName = error.field || getFieldFromErrorMessage(error.message || error);
+          if (!fieldName) return;
+          
+          const field = document.querySelector(`input[name="${fieldName}"]`) || 
+                        document.getElementById(fieldName);
+          
+          if (field) {
+            // Add error class to the field
+            field.classList.add('error');
+            
+            // Add error message below the field
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = error.message || error;
+            field.parentNode.appendChild(errorDiv);
+          }
+        });
+      }
+      
+      // Helper function to extract field name from error message
+      function getFieldFromErrorMessage(message) {
+        if (!message) return null;
+        
+        const fieldMap = {
+          'username': 'username',
+          'email': 'email',
+          'password': 'password',
+          'fullname': 'fullname',
+          'confirmPassword': 'confirm_password',
+          'profilepic': 'profilepic'
+        };
+        
+        for (const [key, value] of Object.entries(fieldMap)) {
+          if (message.toLowerCase().includes(key.toLowerCase())) {
+            return value;
+          }
+        }
+        return null;
+      }
+      
+      // Check for URL parameters for messages
+      const urlParams = new URLSearchParams(window.location.search);
+      const errorMsg = urlParams.get('error');
+      const successMsg = urlParams.get('success');
+      
+      if (errorMsg) {
+        showToast(decodeURIComponent(errorMsg), 'error');
+      }
+      
+      if (successMsg) {
+        showToast(decodeURIComponent(successMsg), 'success');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Thriftify - Buy & Sell Items</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Global Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      flex: 1;
+    }
+    
+    /* Navbar Styles */
+    .navbar {
+      background: #2c3e50;
+      color: white;
+      padding: 15px 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .navbar-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #fff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+    
+    .logo i {
+      margin-right: 10px;
+      color: #3498db;
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 20px;
+    }
+    
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      padding: 5px 10px;
+      border-radius: 4px;
+      transition: all 0.3s;
+    }
+    
+    .nav-links a:hover {
+      background: rgba(255,255,255,0.1);
+      transform: translateY(-2px);
+    }
+    
+    /* Page Title */
+    h1 {
+      text-align: center;
+      margin: 30px 0;
+      color: #2c3e50;
+      font-size: 2.2rem;
+      position: relative;
+      padding-bottom: 15px;
+    }
+    
+    h1:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: 3px;
+      background: #3498db;
+    }
+    
+    /* Filters Section */
+    .filters {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.05);
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    .filter-item {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .filter-item label {
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    
+    input, select, button {
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+    }
+    
+    button {
+      background: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      min-width: 120px;
+    }
+    
+    button:hover {
+      background: #2980b9;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    /* Listings Grid */
+    #listings {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 25px;
+    }
+    
+    .listing {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.08);
+      overflow: hidden;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    .listing:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    
+    .listing-image {
+      height: 200px;
+      overflow: hidden;
+    }
+    
+    .listing-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s;
+    }
+    
+    .listing:hover .listing-image img {
+      transform: scale(1.05);
+    }
+    
+    .listing-details {
+      padding: 20px;
+      flex: 1;
+    }
+    
+    .listing-details h2 {
+      margin: 0 0 10px 0;
+      font-size: 1.3rem;
+      color: #2c3e50;
+    }
+    
+    .listing-description {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .price {
+      font-size: 1.4rem;
+      color: #27ae60;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+    
+    .listing-meta {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
+      font-size: 0.85rem;
+      color: #7f8c8d;
+    }
+    
+    .posted-by {
+      font-size: 0.85rem;
+      color: #7f8c8d;
+      margin-top: 15px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .posted-by i {
+      color: #3498db;
+    }
+    
+    .listing-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .listing-actions button {
+      flex: 1;
+      padding: 10px;
+      font-size: 0.9rem;
+    }
+    
+    .buyNowBtn {
+      background: #27ae60;
+    }
+    
+    .buyNowBtn:hover {
+      background: #219653;
+    }
+    
+    .bookmarkBtn {
+      background: #e74c3c;
+    }
+    
+    .bookmarkBtn:hover {
+      background: #c0392b;
+    }
+    
+    .bookmarkBtn.bookmarked {
+      background: #7f8c8d;
+    }
+    
+    #noData {
+      text-align: center;
+      grid-column: 1 / -1;
+      margin: 50px 0;
+      font-size: 1.2rem;
+      color: #95a5a6;
+    }
+    
+    /* Add Product Button */
+    .add-product-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #3498db;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      z-index: 99;
+      transition: all 0.3s;
+    }
+    
+    .add-product-btn:hover {
+      transform: scale(1.1) rotate(90deg);
+      background: #2980b9;
+    }
+    
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .modal.active {
+      display: flex;
+      opacity: 1;
+    }
+    
+    .modal-content {
+      background: white;
+      width: 100%;
+      max-width: 600px;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(0,0,0,0.3);
+      animation: slideIn 0.3s forwards;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .modal-header {
+      background: #2c3e50;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    
+    .close-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0 5px;
+      min-width: auto;
+    }
+    
+    .close-btn:hover {
+      color: #e74c3c;
+    }
+    
+    .modal-body {
+      padding: 20px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #2c3e50;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .image-preview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .preview-img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+    
+    .submit-btn {
+      background: #27ae60;
+      color: white;
+      border: none;
+      padding: 12px 15px;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 20px;
+      transition: all 0.3s;
+    }
+    
+    .submit-btn:hover {
+      background: #219653;
+      transform: translateY(-2px);
+    }
+    
+    /* Footer */
+    .footer {
+      background: #2c3e50;
+      color: white;
+      padding: 40px 0 20px;
+      margin-top: 50px;
+    }
+    
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      padding: 0 20px;
+    }
+    
+    .footer-column h3 {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      color: #3498db;
+    }
+    
+    .footer-column ul {
+      list-style: none;
+    }
+    
+    .footer-column ul li {
+      margin-bottom: 10px;
+    }
+    
+    .footer-column a {
+      color: #ecf0f1;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+    
+    .footer-column a:hover {
+      color: #3498db;
+      padding-left: 5px;
+    }
+    
+    .footer-bottom {
+      text-align: center;
+      padding-top: 30px;
+      margin-top: 30px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      color: #95a5a6;
+      font-size: 0.9rem;
+    }
+    
+    .social-icons {
+      display: flex;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .social-icons a {
+      color: white;
+      font-size: 1.2rem;
+      transition: all 0.3s;
+    }
+    
+    .social-icons a:hover {
+      color: #3498db;
+      transform: translateY(-3px);
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .navbar-container {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .filters {
+        flex-direction: column;
+      }
+      
+      #listings {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+      }
+      
+      .add-product-btn {
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+      }
+      
+      .listing-actions {
+        flex-direction: column;
+      }
+      
+      .modal-content {
+        width: 95%;
+        max-height: 85vh;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      #listings {
+        grid-template-columns: 1fr;
+      }
+      
+      .container {
+        padding: 10px;
+      }
+      
+      h1 {
+        font-size: 1.8rem;
+        margin: 20px 0;
+      }
+      
+      .listing-image {
+        height: 180px;
+      }
+      
+      .listing-details h2 {
+        font-size: 1.1rem;
+      }
+      
+      .price {
+        font-size: 1.2rem;
+      }
+      
+      .footer-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+    }
+    
+    @media (max-width: 380px) {
+      .footer-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .listing-meta {
+        flex-direction: column;
+        gap: 5px;
+        align-items: flex-start;
+      }
+      
+      .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+      }
+    }
+    
+    /* Search Bar Styles */
+    .search-bar {
+      width: 100%;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    
+    .search-bar input {
+      width: 100%;
+      padding: 15px 20px;
+      padding-left: 50px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .search-bar input:focus {
+      outline: none;
+      box-shadow: 0 2px 20px rgba(52, 152, 219, 0.3);
+    }
+    
+    .search-bar i {
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #95a5a6;
+      font-size: 18px;
+    }
+    
+    .search-bar .clear-search {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #7f8c8d;
+      cursor: pointer;
+      font-size: 16px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+    }
+    
+    .search-bar input:not(:placeholder-shown) + .clear-search {
+      opacity: 1;
+      visibility: visible;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <%- include('partials/header') %>
+
+  <div class="container">
+    <h1>Discover Amazing Deals</h1>
+    
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <form id="searchForm" action="/search" method="GET">
+        <input type="text" id="searchInput" name="q" placeholder="Search for items..." value="<%= filters?.query || '' %>">
+        <i class="fas fa-search"></i>
+        <button type="submit" style="display:none;"></button>
+        
+        <!-- Hidden fields to preserve filter state when submitting -->
+        <% if(locals.filters) { %>
+          <% if(filters.category) { %>
+            <input type="hidden" name="category" value="<%= filters.category %>">
+          <% } %>
+          <% if(filters.location) { %>
+            <input type="hidden" name="location" value="<%= filters.location %>">
+          <% } %>
+          <% if(filters.sortBy) { %>
+            <input type="hidden" name="sortBy" value="<%= filters.sortBy %>">
+          <% } %>
+        <% } %>
+      </form>
+      <span class="clear-search" id="clearSearch">&times;</span>
+    </div>
+
+    <div class="filters">
+      <div class="filter-item">
+        <label for="category">Category</label>
+        <select id="category" name="category">
+          <option value="">All Categories</option>
+          <% if (locals.categories && categories.length > 0) { %>
+            <% categories.forEach(cat => { %>
+              <option value="<%= cat %>" <%= filters?.category === cat ? 'selected' : '' %>><%= cat.charAt(0).toUpperCase() + cat.slice(1) %></option>
+            <% }) %>
+          <% } else { %>
+            <option value="electronics">Electronics</option>
+            <option value="furniture">Furniture</option>
+            <option value="clothing">Clothing</option>
+            <option value="books">Books</option>
+            <option value="others">Others</option>
+          <% } %>
+        </select>
+      </div>
+      <div class="filter-item">
+        <label for="location">Location</label>
+        <input type="text" id="location" placeholder="Enter city name">
+      </div>
+      <div class="filter-item">
+        <label for="sortOrder">Sort By</label>
+        <select id="sortOrder">
+          <option value="desc" selected>Newest First</option>
+          <option value="asc">Oldest First</option>
+          <option value="price_low">Price: Low to High</option>
+          <option value="price_high">Price: High to Low</option>
+        </select>
+      </div>
+      <div class="filter-item">
+        <label>&nbsp;</label>
+        <button id="filterBtn"><i class="fas fa-filter"></i> Apply Filters</button>
+      </div>
+    </div>
+
+    <div id="listings">
+      <!-- Add debug output -->
+      <% if (locals.listings && listings.length > 0) { %>
+        <!-- Server-side rendering of listings -->
+        <% listings.forEach(function(listing) { %>
+          <div class="listing">
+            <div class="listing-image">
+              <img src="<%= listing.images && listing.images.length ? listing.images[0] : 'https://via.placeholder.com/400x300?text=No+Image' %>" alt="<%= listing.title || 'Product' %>">
+            </div>
+            <div class="listing-details">
+              <h2><%= listing.title || 'No Title' %></h2>
+              <p class="listing-description"><%= listing.description || 'No Description' %></p>
+              <div class="price">₹<%= listing.price || 'N/A' %></div>
+              <div class="listing-meta">
+                <span><i class="fas fa-tag"></i> <%= listing.category || 'N/A' %></span>
+                <span><i class="fas fa-map-marker-alt"></i> <%= listing.location || 'N/A' %></span>
+              </div>
+              <div class="posted-by">
+                <i class="fas fa-user-circle"></i> <%= listing.postedBy?.fullname || 'Unknown' %>
+              </div>
+              <div class="listing-actions">
+                <a href="/api/v1/listings/<%= listing._id %>" class="buyNowBtn"><i class="fas fa-shopping-cart"></i> Buy Now</a>
+                <button class="bookmarkBtn" id="bookmarkBtn-<%= listing._id %>" data-id="<%= listing._id %>">
+                  <i class="far fa-bookmark"></i> Bookmark
+                </button>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <p id="noData">No listings found. Try different filters or add your own item.</p>
+      <% } %>
+    </div>
+
+    <!-- No Results Message (hidden by default) -->
+    <div id="noResults" style="display: none; text-align: center; padding: 40px 0;">
+      <i class="fas fa-search" style="font-size: 48px; color: #95a5a6; margin-bottom: 20px;"></i>
+      <h2 style="color: #7f8c8d; margin-bottom: 10px;">No Results Found</h2>
+      <p style="color: #95a5a6;">Try adjusting your search or filters to find what you're looking for.</p>
+      <button id="resetSearchBtn" style="margin-top: 20px;" class="buyNowBtn">Clear Search</button>
+    </div>
+  </div>
+  
+  <!-- Add Product Button -->
+  <div class="add-product-btn" id="addProductBtn">
+    <i class="fas fa-plus"></i>
+  </div>
+
+  <!-- Add Product Modal -->
+  <div class="modal" id="addProductModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>List Your Item</h2>
+        <button class="close-btn" id="closeModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="addProductForm">
+          <div class="form-group">
+            <label for="title">Title *</label>
+            <input type="text" id="title" name="title" required>
+          </div>
+          <div class="form-group">
+            <label for="description">Description *</label>
+            <textarea id="description" name="description" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="price">Price (₹) *</label>
+            <input type="number" id="price" name="price" min="1" required>
+          </div>
+          <div class="form-group">
+            <label for="itemCategory">Category *</label>
+            <select id="itemCategory" name="category" required>
+              <option value="" disabled selected>Select a category</option>
+              <option value="electronics">Electronics</option>
+              <option value="furniture">Furniture</option>
+              <option value="clothing">Clothing</option>
+              <option value="books">Books</option>
+              <option value="others">Others</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="itemLocation">Location *</label>
+            <input type="text" id="itemLocation" name="location" required>
+          </div>
+          <div class="form-group">
+            <label for="images">Images (Max 5) *</label>
+            <input type="file" id="images" name="images" accept="image/*" multiple required>
+            <div class="image-preview" id="imagePreview"></div>
+          </div>
+          <button type="submit" class="submit-btn">List Item</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-column">
+        <h3>Thriftify</h3>
+        <ul>
+          <li><a href="/about">About Us</a></li>
+          <li><a href="/careers">Careers</a></li>
+          <li><a href="/press">Press</a></li>
+          <li><a href="/contact">Contact Us</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-column">
+        <h3>Categories</h3>
+        <ul>
+          <li><a href="/categories/electronics">Electronics</a></li>
+          <li><a href="/categories/furniture">Furniture</a></li>
+          <li><a href="/categories/clothing">Clothing</a></li>
+          <li><a href="/categories/books">Books</a></li>
+          <li><a href="/categories/others">Others</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-column">
+        <h3>Help & Support</h3>
+        <ul>
+          <li><a href="/faq">FAQ</a></li>
+          <li><a href="/help">Help Center</a></li>
+          <li><a href="/trust">Trust & Safety</a></li>
+          <li><a href="/terms">Terms of Service</a></li>
+          <li><a href="/privacy">Privacy Policy</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-column">
+        <h3>Connect With Us</h3>
+        <div class="social-icons">
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-pinterest"></i></a>
+          <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+        <p style="margin-top: 15px;">
+          Subscribe to our newsletter for exclusive deals
+        </p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2023 Thriftify. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Global variable to store all fetched listings
+    let allListings = [];
+    let currentSearchQuery = "";
+
+    // Fetch and display listings
+    async function fetchListings() {
+      const category = document.getElementById('category').value;
+      console.log('Selected category:', category); // Debug log to see selected value
+      const location = document.getElementById('location').value;
+      const sortOrder = document.getElementById('sortOrder').value;
+      const searchQuery = document.getElementById('searchInput').value.trim();
+      currentSearchQuery = searchQuery;
+
+      let query = `?sortOrder=${sortOrder}`;
+      if (category) {
+        // Ensure category is properly formatted for the API
+        query += `&category=${encodeURIComponent(category.toLowerCase())}`;
+      }
+      if (location) query += `&location=${encodeURIComponent(location)}`;
+      if (searchQuery) query += `&query=${encodeURIComponent(searchQuery)}`;
+
+      console.log('API query string:', query); // Debug the final query string
+
+      try {
+        // First try to get the user's bookmarks, but don't block if it fails
+        let userBookmarks = [];
+        try {
+          // Use the correct endpoint for retrieving user bookmarks
+          const bookmarkRes = await fetch('/api/v1/user/bookmarks');
+          if (bookmarkRes.ok) {
+            userBookmarks = await bookmarkRes.json();
+            console.log('User bookmarks loaded:', userBookmarks.length);
+          }
+        } catch (err) {
+          console.log('Error fetching bookmarks:', err);
+          console.log('User not logged in or bookmarks unavailable');
+          // Continue without bookmarks
+        }
+
+        const res = await fetch(`/api/v1/listings/sorted${query}`);
+        if (!res.ok) {
+          throw new Error(`Failed to fetch listings: ${res.status}`);
+        }
+        const data = await res.json();
+        allListings = Array.isArray(data) ? data : [];
+        displayListings(allListings, userBookmarks);
+      } catch (error) {
+        console.log('Error fetching listings:', error);
+        document.getElementById('listings').innerHTML = '<p id="noData">No Listings are currently available.</p>';
+        
+        // Hide the no results element
+        document.getElementById('noResults').style.display = 'none';
+      }
+    }
+    
+    // Function to display listings
+    function displayListings(listings, userBookmarks = []) {
+      const listingsDiv = document.getElementById('listings');
+      const noResultsDiv = document.getElementById('noResults');
+      listingsDiv.innerHTML = '';
+      if (!Array.isArray(listings) || listings.length === 0) {
+        if (currentSearchQuery) {
+          // Show the no results found UI
+          listingsDiv.style.display = 'none';
+          noResultsDiv.style.display = 'block';
+        } else {
+          // Show standard no listings message
+          listingsDiv.innerHTML = '<p id="noData">No listings found. Try different filters or add your own item.</p>';
+          listingsDiv.style.display = 'grid';
+          noResultsDiv.style.display = 'none';
+        }
+        return;
+      }
+      // Show listings and hide no results message
+      listingsDiv.style.display = 'grid';
+      noResultsDiv.style.display = 'none';
+
+      listings.forEach(listing => {
+        // Check if this listing is bookmarked by the user - improve matching logic
+        const isBookmarked = userBookmarks.some(bookmark => 
+          bookmark.listingId === listing._id || 
+          bookmark._id === listing._id || 
+          (bookmark.listing && bookmark.listing._id === listing._id)
+        );
+        const bookmarkIcon = isBookmarked ? 'fas fa-bookmark' : 'far fa-bookmark';
+        const bookmarkText = isBookmarked ? 'Bookmarked' : 'Bookmark';
+        const bookmarkClass = isBookmarked ? 'bookmarkBtn bookmarked' : 'bookmarkBtn';
+
+        const div = document.createElement('div');
+        div.className = 'listing';
+        div.innerHTML = `
+          <div class="listing-image">
+            <img src="${listing.images && listing.images.length ? listing.images[0] : 'https://via.placeholder.com/400x300?text=No+Image'}" alt="${listing.title || 'Product'}">
+          </div>
+          <div class="listing-details">
+            <h2>${listing.title || 'No Title'}</h2>
+            <p class="listing-description">${listing.description || 'No Description'}</p>
+            <div class="price">₹${listing.price || 'N/A'}</div>
+            <div class="listing-meta">
+              <span><i class="fas fa-tag"></i> ${listing.category || 'N/A'}</span>
+              <span><i class="fas fa-map-marker-alt"></i> ${listing.location || 'N/A'}</span>
+            </div>
+            <div class="posted-by">
+              <i class="fas fa-user-circle"></i> ${listing.postedBy?.fullname || 'Unknown'}
+            </div>
+            <div class="listing-actions">
+              <button class="buyNowBtn" data-id="${listing._id}"><i class="fas fa-shopping-cart"></i> Buy Now</button>
+              <button class="${bookmarkClass}" id="bookmarkBtn-${listing._id}" data-id="${listing._id}"><i class="${bookmarkIcon}"></i> ${bookmarkText}</button>
+            </div>
+          </div>
+        `;
+        listingsDiv.appendChild(div);
+      });
+
+      // Add event listeners for buttons
+      document.querySelectorAll('.buyNowBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          if (this.hasAttribute('data-id')) {
+            const listingId = this.getAttribute('data-id');
+            handleBuyNow(listingId);
+          }
+        });
+      });
+
+      document.querySelectorAll('.bookmarkBtn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const listingId = this.getAttribute('data-id');
+          handleBookmark(listingId);
+        });
+      });
+    }
+
+    // Handle Buy Now button
+    async function handleBuyNow(listingId) {
+      try {
+        // You can redirect to checkout or show more details
+        window.location.href = `/api/v1/listings/${listingId}`;
+      } catch (error) {
+        console.error('Error processing purchase:', error);
+        alert('Unable to process your purchase. Please try again later.');
+      }
+    }
+
+    // Handle Bookmark button
+    async function handleBookmark(listingId) {
+      try {
+        const button = document.querySelector(`#bookmarkBtn-${listingId}`);
+        const originalHTML = button.innerHTML;
+        const originalClass = button.className;
+
+        // Toggle loading state
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        button.disabled = true;
+
+        // Check if user is logged in first
+        try {
+          const checkLoginResponse = await fetch('/api/v1/user/check-auth');
+          if (!checkLoginResponse.ok) {
+            // User is not logged in
+            alert('Please log in to bookmark items');
+            window.location.href = '/api/v1/user/login';
+            return;
+          }
+        } catch (err) {
+          // If auth check fails, try the bookmark operation anyway
+          console.log('Auth check error:', err);
+        }
+
+        // Send an API request to toggle bookmark the listing
+        const response = await fetch(`/api/v1/bookmarks/toggle/${listingId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ listingId: listingId })
+        });
+
+        let data;
+        let isSuccess = false;
+        let isBookmarked = false;
+        
+        try {
+          data = await response.json();
+          // Handle the special case where we get a message "Listing bookmarked"
+          // This is actually a success message despite not having a success field
+          if (data.message && (
+              data.message.includes('bookmarked') || 
+              data.message.includes('removed from bookmarks')
+          )) {
+            isSuccess = true;
+            isBookmarked = data.message.includes('bookmarked') && !data.message.includes('removed');
+          } else {
+            isSuccess = data.success || response.ok;
+            isBookmarked = data.isBookmarked ?? !button.classList.contains('bookmarked');
+          }
+        } catch (err) {
+          console.log('Error parsing response:', err);
+          // Use response.ok as fallback for success status
+          isSuccess = response.ok;
+          isBookmarked = !button.classList.contains('bookmarked'); // Toggle based on current state
+        }
+
+        // Re-enable button
+        button.disabled = false;
+
+        // If the bookmark toggle operation was successful
+        if (isSuccess) {
+            // Update the button appearance based on bookmark status
+            if (isBookmarked) {
+                button.innerHTML = '<i class="fas fa-bookmark"></i> Bookmarked';
+                button.className = 'bookmarkBtn bookmarked';
+            } else {
+                button.innerHTML = '<i class="far fa-bookmark"></i> Bookmark';
+                button.className = 'bookmarkBtn';
+            }
+            // Show a small notification
+            showBookmarkNotification(isBookmarked);
+        } else {
+            // If there was an error, reset the button to original state
+            button.disabled = false;
+            button.innerHTML = originalHTML;
+            button.className = originalClass;
+
+            // Check if we need to redirect for auth issues
+            if (response.status === 401) {
+                alert('Please log in to bookmark items');
+                window.location.href = '/api/v1/user/login';
+            } else {
+                console.error('Error updating bookmark:', response.status);
+            }
+        }
+      } catch (error) {
+        console.error('Error toggling bookmark:', error);
+        // Reset the button to a known good state
+        const button = document.querySelector(`#bookmarkBtn-${listingId}`);
+        button.disabled = false;
+        const isCurrentlyBookmarked = button.classList.contains('bookmarked');
+        if (isCurrentlyBookmarked) {
+            button.innerHTML = '<i class="fas fa-bookmark"></i> Bookmarked';
+        } else {
+            button.innerHTML = '<i class="far fa-bookmark"></i> Bookmark';
+        }
+      }
+    }
+        
+    // Function to show bookmark notification
+    function showBookmarkNotification(isBookmarked) {
+        const notification = document.createElement('div');
+        notification.className = 'bookmark-notification';
+        notification.textContent = isBookmarked ? 'Added to bookmarks!' : 'Removed from bookmarks!';
+        document.body.appendChild(notification);
+        
+        // Remove notification after 2 seconds        
+        setTimeout(() => {
+            notification.classList.add('fade-out');
+            setTimeout(() => notification.remove(), 500);
+        }, 2000);
+    }
+
+    // Search functionality - use form submission for search route
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+      // Only use input event for real-time filtering on the home page
+      if (window.location.pathname !== '/search') {
+        fetchListings();
+      }
+    });
+    // Search form submission
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+      // Let the form submit naturally to the server-side search route
+      // This ensures proper filtering on the backend
+    });
+
+    // Clear search button functionality
+    document.getElementById('clearSearch').addEventListener('click', function() {
+      document.getElementById('searchInput').value = '';
+      // If on search page, go back to home instead of doing client-side search
+      if (window.location.pathname === '/search' || window.location.pathname.includes('/search')) {
+        window.location.href = '/';
+      } else {
+        // Otherwise do client-side filtering
+        fetchListings();
+      }
+    });
+
+    // Reset search button in "No Results" message
+    document.getElementById('resetSearchBtn').addEventListener('click', function() {
+      document.getElementById('searchInput').value = '';
+      // If on search page, go back to home
+      if (window.location.pathname === '/search' || window.location.pathname.includes('/search')) {
+        window.location.href = '/';
+      } else {
+        // Otherwise do client-side filtering
+        fetchListings();
+      }
+    });
+
+    // Add CSS for the notification and bookmark button
+    document.head.insertAdjacentHTML('beforeend', `
+      <style>
+        .bookmark-notification {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background: #27ae60;
+          color: white;
+          padding: 10px 20px;
+          border-radius: 4px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+          z-index: 1000;
+          animation: slideIn 0.3s forwards;
+          transition: opacity 0.5s;
+        }
+        
+        .bookmark-notification.fade-out {
+          opacity: 0;
+        }
+        
+        .bookmarkBtn {
+          background: #e74c3c;
+        }
+        
+        .bookmarkBtn:hover {
+          background: #c0392b;
+        }
+        
+        .bookmarkBtn.bookmarked {
+          background: #7f8c8d !important;
+        }
+      </style>
+    `);
+
+    // Add filter button click handler
+    document.getElementById('filterBtn').addEventListener('click', function() {
+      console.log('Filter button clicked');
+      fetchListings();
+    });
+
+    // Load listings initially
+    window.onload = fetchListings;
+  </script>
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add responsive meta tag if not already present
+    if (!document.querySelector('meta[name="viewport"]')) {
+      const meta = document.createElement('meta');
+      meta.setAttribute('name', 'viewport');
+      meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+      document.head.appendChild(meta);
+    }
+
+    // Add responsive styles
+    const responsiveStyles = `
+      @media (max-width: 768px) {
+        #listings {
+          grid-template-columns: repeat(2, 1fr) !important;
+          gap: 15px !important;
+        }
+        .listing-image {
+          height: 160px !important;
+        }
+        .add-product-btn {
+          bottom: 15px !important;
+          right: 15px !important;
+          width: 50px !important;
+          height: 50px !important;
+        }
+        
+        .listing-actions {
+          flex-direction: column !important;
+        }
+        
+        .modal-content {
+          width: 95% !important; 
+          max-width: 95% !important; 
+        }
+        
+        .listing-details h2 {
+          font-size: 1.1rem !important;
+        }
+        
+        .price {
+          font-size: 1.2rem !important;
+        }
+      }
+      
+      @media (max-width: 576px) {
+        #listings {
+          grid-template-columns: 1fr !important;
+        }
+        .container { 
+          padding: 10px !important; 
+        } 
+        h1 {
+          font-size: 1.5rem !important; 
+          margin: 15px 0 !important; 
+        }
+        .filters {
+          padding: 15px !important;
+        }
+      }
+      
+      @media (max-width: 380px) {
+        .listing-meta {
+          flex-direction: column !important;
+          align-items: flex-start !important;
+          gap: 5px !important;
+        }
+        .filter-item {
+          width: 100% !important;
+        }
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+          font-size: 0.9rem !important;
+        }
+      }
+    `;
+    // Add these styles to the page
+    const style = document.createElement('style');
+    style.textContent = responsiveStyles;
+    document.head.appendChild(style);
+  });
+  </script>
+</body>
+</html>

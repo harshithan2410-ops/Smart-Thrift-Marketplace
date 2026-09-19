@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - Thriftify</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.12.0/toastify.min.css">
+  <style>
+    /* Global Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f7f7f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 20px;
+    }
+    
+    .login-container {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 450px;
+      padding: 30px;
+    }
+    
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .login-header h1 {
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    
+    .login-header p {
+      color: #7f8c8d;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #2c3e50;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 5px rgba(52,152,219,0.3);
+    }
+    
+    .password-container {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #7f8c8d;
+    }
+    
+    .submit-btn {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 12px 15px;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+    
+    .submit-btn:hover {
+      background: #2980b9;
+    }
+    
+    .alt-login {
+      margin-top: 20px;
+      text-align: center;
+    }
+    
+    .alt-login p {
+      color: #7f8c8d;
+      margin-bottom: 15px;
+    }
+    
+    .signup-link {
+      text-align: center;
+      margin-top: 20px;
+      color: #7f8c8d;
+    }
+    
+    .signup-link a {
+      color: #3498db;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .signup-link a:hover {
+      text-decoration: underline;
+    }
+    
+    .home-link {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: #2c3e50;
+      text-decoration: none;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+    }
+    
+    .home-link i {
+      margin-right: 5px;
+    }
+    
+    /* Toast Styles */
+    .toastify {
+      padding: 12px 20px;
+      color: white;
+      display: inline-block;
+      box-shadow: 0 3px 6px -1px rgba(0, 0, 0, 0.12);
+      background: linear-gradient(to right, #00b09b, #96c93d);
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      z-index: 9999;
+    }
+    
+    .toastify.error {
+      background: linear-gradient(to right, #ff5f6d, #ffc371);
+    }
+  </style>
+</head>
+<body>
+  <a href="/" class="home-link">
+    <i class="fas fa-home"></i> Back to Home
+  </a>
+  
+  <div id="toast-container"></div>
+  
+  <div class="login-container">
+    <div class="login-header">
+      <h1>Welcome to Thriftify</h1>
+      <p>Sign in to your account</p>
+    </div>
+    
+    <form action="/api/v1/user/login" method="POST">
+      <div class="form-group">
+        <label for="identifier">Email</label>
+        <input type="text" id="email" name="email" placeholder="Enter your  email" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="password-container">
+          <input type="password" id="password" name="password" placeholder="Enter your password" required>
+          <i class="password-toggle fas fa-eye" id="togglePassword"></i>
+        </div>
+      </div>
+      
+      <button type="submit" class="submit-btn">Sign In</button>
+    </form>
+    
+    <div class="signup-link">
+      <p>Don't have an account? <a href="/api/v1/user/signup">Sign Up</a></p>
+    </div>
+  </div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.12.0/toastify.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.querySelector('form');
+      
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        const loginData = {};
+        formData.forEach((value, key) => {
+          loginData[key] = value;
+        });
+        
+        fetch('/api/v1/user/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(loginData),
+          redirect: 'follow'
+        })
+        .then(response => {
+          if (response.ok) {
+            showToast('Login successful! Redirecting...', 'success');
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 2000);
+          } else if (response.redirected) {
+            window.location.href = response.url;
+          } else {
+            // If not redirected, probably has an error
+            showToast('Invalid email or password', 'error');
+          }
+        })
+        .catch(error => {
+          showToast('An error occurred. Please try again.', error);
+          console.log('Error:', error);
+          console.error('Error:', error);
+        });
+      });
+      
+      // Password visibility toggle
+      const togglePassword = document.getElementById('togglePassword');
+      const passwordInput = document.getElementById('password');
+      
+      togglePassword.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+      });
+      
+      // Function to show toast notifications
+      function showToast(message, type = 'success') {
+        Toastify({
+          text: message,
+          duration: 3000,
+          close: true,
+          gravity: "top", 
+          position: "right",
+          className: type,
+          stopOnFocus: true
+        }).showToast();
+      }
+      
+      // Check for URL parameters for messages
+      const urlParams = new URLSearchParams(window.location.search);
+      const errorMsg = urlParams.get('error');
+      const successMsg = urlParams.get('success');
+      
+      if (errorMsg) {
+        showToast(decodeURIComponent(errorMsg), 'error');
+      }
+      
+      if (successMsg) {
+        showToast(decodeURIComponent(successMsg), 'success');
+      }
+    });
+  </script>
+</body>
+</html>

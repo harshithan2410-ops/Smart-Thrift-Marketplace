@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"="width=device-width, initial-scale=1.0">
+    <title>Your Profile | Thriftify</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .profile-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 2rem;
+        }
+        
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #f0f0f0;
+        }
+        
+        .profile-info h1 {
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        
+        .profile-username {
+            color: #777;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 2rem;
+        }
+        
+        .tab {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid #3498db;
+            color: #3498db;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .listings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .listing-card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .listing-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        
+        .listing-info {
+            padding: 1rem;
+        }
+        
+        .listing-title {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .listing-price {
+            color: #3498db;
+            font-weight: bold;
+        }
+        
+        /* Toast notification styles */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            color: white;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .notification.fade-out {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .notification.success {
+            background-color: #28a745;
+        }
+        
+        .notification.error {
+            background-color: #dc3545;
+        }
+        
+        .notification.warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .notification.info {
+            background-color: #17a2b8;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        /* Loading spinner styles */
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 3px solid #ffffff;
+            animation: spin 1s linear infinite;
+            vertical-align: middle;
+        }
+        
+        .btn-content {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Disabled button style */
+        .btn:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        /* Add responsive styles */
+        .profile-container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        
+        .profile-header {
+            flex-wrap: wrap;
+        }
+        
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .listings-grid {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        }
+        
+        @media (max-width: 768px) {
+            .profile-container {
+                padding: 1rem;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+                justify-content: flex-start;
+                padding-bottom: 5px;
+            }
+            
+            .tab {
+                min-width: 90px;
+                white-space: nowrap;
+            }
+            
+            .listings-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .profile-container {
+                padding: 0.5rem;
+            }
+            
+            .profile-pic {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .profile-info h1 {
+                font-size: 1.3rem;
+            }
+            
+            .profile-username {
+                font-size: 1rem;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+            }
+            
+            .listings-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group label {
+                font-size: 0.9rem;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .profile-pic {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Include header/navigation if you have one -->
+    <%- include('partials/header') %>
+    
+    <div class="profile-container">
+        <div class="profile-header">
+            <img src="<%= user.profilepic || '/images/default-profile.png' %>" alt="Profile Picture" class="profile-pic">
+            <div class="profile-info">
+                <h1><%= user.fullname %></h1>
+                <div class="profile-username">@<%= user.username %></div>
+                <div>Member since <%= new Date(user.createdAt).toLocaleDateString() %></div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="my-info">My Info</div>
+            <div class="tab" data-tab="my-listings">My Listings</div>
+            <div class="tab" data-tab="my-orders">My Orders</div>
+            <div class="tab" data-tab="bookmarks">Bookmarks</div>
+        </div>
+        
+        <div class="tab-content active" id="my-info">
+            <div class="tabs">
+                <div class="tab active" data-subtab="profile-details">Profile Details</div>
+                <div class="tab" data-subtab="change-password">Change Password</div>
+                <div class="tab" data-subtab="update-profile-pic">Update Profile Picture</div>
+            </div>
+            
+            <div class="tab-content active" id="profile-details">
+                <h3>Update Profile Details</h3>
+                <form action="/api/v1/user/update-details" method="PATCH" id="update-details-form">
+                    <div class="form-group">
+                        <label for="fullname">Full Name</label>
+                        <input type="text" id="fullname" name="fullname" value="<%= user.fullname %>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" value="<%= user.username %>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" value="<%= user.email %>" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="update-details-btn">
+                        <span class="btn-content">
+                            Update Details
+                            <span class="loading-spinner" id="details-spinner"></span>
+                        </span>
+                    </button>
+                </form>
+            </div>
+            
+            <div class="tab-content" id="change-password">
+                <h3>Change Password</h3>
+                <form action="/api/v1/user/update-password" method="PATCH" id="update-password-form">
+                    <div class="form-group">
+                        <label for="oldPassword">Current Password</label>
+                        <input type="password" id="oldPassword" name="oldPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" name="newPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="update-password-btn">
+                        <span class="btn-content">
+                            Update Password
+                            <span class="loading-spinner" id="password-spinner"></span>
+                        </span>
+                    </button>
+                </form>
+            </div>
+            
+            <div class="tab-content" id="update-profile-pic">
+                <h3>Update Profile Picture</h3>
+                <form action="/api/v1/user/update-profilepic" method="PATCH" id="update-profilepic-form" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="profilepic">Select New Profile Picture</label>
+                        <input type="file" id="profilepic" name="profilepic" accept="image/*" required>
+                    </div>
+                    <div class="form-group">
+                        <img id="preview" src="#" alt="Preview" style="max-width: 200px; max-height: 200px; display: none;">
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="update-pic-btn">
+                        <span class="btn-content">
+                            Update Profile Picture
+                            <span class="loading-spinner" id="pic-spinner"></span>
+                        </span>
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="my-listings">
+            <h3>My Listings</h3>
+            <% if (user.listings && user.listings.length > 0) { %>
+                <div class="listings-grid">
+                    <% user.listings.forEach(listing => { %>
+                        <div class="listing-card">
+                            <img src="<%= listing.images[0] || '/images/default-product.png' %>" alt="<%= listing.title %>">
+                            <div class="listing-info">
+                                <h4 class="listing-title"><%= listing.title %></h4>
+                                <div class="listing-price">₹<%= listing.price %></div>
+                                <div class="listing-actions" style="display: flex; gap: 10px; margin-top: 10px;">
+                                    <button class="btn-update-listing" style="background-color: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;" data-id="<%= listing._id %>" data-title="<%= listing.title %>" data-description="<%= listing.description %>" data-price="<%= listing.price %>" data-category="<%= listing.category %>" data-location="<%= listing.location || '' %>">Update</button>
+                                    <button class="btn-delete-listing" style="background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;" data-id="<%= listing._id %>">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <p>You haven't created any listings yet.</p>
+            <% } %>
+        </div>
+
+        <div class="tab-content" id="my-orders">
+            <h3>My Orders</h3>
+            <% 
+            // Check both possible sources of orders data
+            const ordersData = orders || user.orders || [];
+            if (ordersData && ordersData.length > 0) { 
+            %>
+                <div class="orders-list">
+                    <% ordersData.forEach(order => { %>
+                        <div class="order-card" style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
+                            <div class="order-header" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <div>
+                                    <strong>Order #<%= order._id %></strong>
+                                    <div>Placed on: <%= new Date(order.placedAt || order.createdAt).toLocaleString() %></div>
+                                </div>
+                                <div>
+                                    <span class="order-status" style="padding: 5px 10px; border-radius: 3px; background-color: <%= 
+                                        order.orderStatus === 'delivered' || order.status === 'Delivered' ? '#28a745' : 
+                                        order.orderStatus === 'pending' || order.status === 'Processing' ? '#ffc107' : '#17a2b8' %>; 
+                                        color: white;">
+                                        <%= order.orderStatus || order.status || 'Processing' %>
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="order-items">
+                                <% if (order.listing) { %>
+                                    <div class="order-item" style="display: flex; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+                                        <div class="item-image" style="width: 80px; margin-right: 15px;">
+                                            <img src="<%= order.listing.images && order.listing.images[0] || '/images/default-product.png' %>" 
+                                                alt="<%= order.listing.title || 'Product' %>" 
+                                                style="width: 100%; height: auto; border-radius: 3px;">
+                                        </div>
+                                        <div class="item-details" style="flex-grow: 1;">
+                                            <div class="item-title"><%= order.listing.title || 'Product' %></div>
+                                            <div class="item-price">₹<%= order.listing.price || '0' %></div>
+                                            <div class="item-quantity">Quantity: 1</div>
+                                        </div>
+                                    </div>
+                                <% } else if (order.items && order.items.length > 0) { %>
+                                    <% order.items.forEach(item => { %>
+                                        <div class="order-item" style="display: flex; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+                                            <div class="item-image" style="width: 80px; margin-right: 15px;">
+                                                <img src="<%= item.image || '/images/default-product.png' %>" 
+                                                    alt="<%= item.title %>" 
+                                                    style="width: 100%; height: auto; border-radius: 3px;">
+                                            </div>
+                                            <div class="item-details" style="flex-grow: 1;">
+                                                <div class="item-title"><%= item.title %></div>
+                                                <div class="item-price">₹<%= item.price %></div>
+                                                <div class="item-quantity">Quantity: <%= item.quantity || 1 %></div>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                <% } else { %>
+                                    <p>No details available for this order.</p>
+                                <% } %>
+                            </div>
+                            
+                            <div class="order-footer" style="display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                                <div class="order-total">
+                                    <strong>Total: ₹<%= 
+                                        (order.paymentInfo && order.paymentInfo.amount ? (order.paymentInfo.amount * 84.58).toFixed(2) : null) || 
+                                        (order.listing && order.listing.price) || 
+                                        'N/A' 
+                                    %></strong>
+                                    <div class="payment-status" style="font-size: 0.9rem; margin-top: 5px;">
+                                        Payment Status: 
+                                        <span style="color: <%= (order.isPaid && order.isPaid) ? '#28a745' : '#e74c3c' %>;">
+                                            <%= (order.isPaid && order.isPaid) ? 'Paid' : 'Unpaid' %>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="order-actions">
+                                    <a href="/api/v1/orders/view/<%= order._id %>" class="btn btn-primary" style="font-size: 0.9rem; padding: 5px 10px;">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <p>You haven't placed any orders yet.</p>
+            <% } %>
+        </div>
+        
+        <div class="tab-content" id="bookmarks">
+            <h3>Bookmarked Items</h3>
+            <% if (user.Bookmarks && user.Bookmarks.length > 0) { %>
+                <div class="listings-grid">
+                    <% user.Bookmarks.forEach(bookmark => { %>
+                        <div class="listing-card">
+                            <img src="<%= bookmark.images[0] || '/images/default-product.png' %>" alt="<%= bookmark.title %>">
+                            <div class="listing-info">
+                                <h4 class="listing-title"><%= bookmark.title %></h4>
+                                <div class="listing-price">₹<%= bookmark.price %></div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <p>You haven't bookmarked any items yet.</p>
+            <% } %>
+        </div>
+    </div>
+    
+    <!-- Toast notification container -->
+    <div id="toast-container"></div>
+    
+    <!-- Add the update listing modal below the main content but before the footer -->
+    <div id="updateListingModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 1000; overflow: auto;">
+        <div style="background-color: white; margin: 10% auto; padding: 20px; width: 70%; max-width: 600px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                <h3 style="margin: 0;">Update Listing</h3>
+                <span id="closeUpdateModal" style="cursor: pointer; font-size: 24px; font-weight: bold;">&times;</span>
+            </div>
+            
+            <form id="updateListingForm">
+                <input type="hidden" id="update-listing-id" name="id">
+                
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="update-title" style="display: block; margin-bottom: 5px; font-weight: 500;">Title</label>
+                    <input type="text" id="update-title" name="title" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" required>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="update-description" style="display: block; margin-bottom: 5px; font-weight: 500;">Description</label>
+                    <textarea id="update-description" name="description" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; min-height: 100px;" required></textarea>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="update-price" style="display: block; margin-bottom: 5px; font-weight: 500;">Price (₹)</label>
+                    <input type="number" id="update-price" name="price" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" required>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="update-category" style="display: block; margin-bottom: 5px; font-weight: 500;">Category</label>
+                    <select id="update-category" name="category" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" required>
+                        <option value="electronics">Electronics</option>
+                        <option value="furniture">Furniture</option>
+                        <option value="clothing">Clothing</option>
+                        <option value="books">Books</option>
+                        <option value="others">Others</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="update-location" style="display: block; margin-bottom: 5px; font-weight: 500;">Location</label>
+                    <input type="text" id="update-location" name="location" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+                
+                <div style="text-align: right;">
+                    <button type="button" id="cancelUpdateBtn" style="background-color: #95a5a6; color: white; border: none; padding: 8px 15px; border-radius: 4px; margin-right: 10px; cursor: pointer;">Cancel</button>
+                    <button type="submit" id="update-listing-btn" style="background-color: #3498db; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">
+                        <span class="btn-content">
+                            Update Listing
+                            <span class="loading-spinner" id="listing-spinner"></span>
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Include footer if you have one -->
+    <%- include('partials/footer') %>
+    
+    <script>
+        // Toast notification function
+        function showNotification(message, type = 'info') {
+            // Remove any existing notifications first
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => {
+                // Clear any existing removal timers
+                if (notification.dataset.timeoutId) {
+                    clearTimeout(parseInt(notification.dataset.timeoutId));
+                }
+                notification.remove();
+            });
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            // Add appropriate icon based on type
+            let icon = '';
+            switch(type) {
+                case 'success':
+                    icon = '<i class="fas fa-check-circle"></i>';
+                    break;
+                case 'error':
+                    icon = '<i class="fas fa-exclamation-circle"></i>';
+                    break;
+                case 'warning':
+                    icon = '<i class="fas fa-exclamation-triangle"></i>';
+                    break;
+                default:
+                    icon = '<i class="fas fa-info-circle"></i>';
+            }
+            
+            notification.innerHTML = `${icon} ${message}`;
+            document.body.appendChild(notification);
+            
+            // Show notification with a small delay for animation
+            setTimeout(() => {
+                notification.classList.add('show');
+                
+                // Set timeout to remove notification
+                const timeoutId = setTimeout(() => {
+                    notification.classList.add('fade-out');
+                    
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 3000);
+                
+                notification.dataset.timeoutId = timeoutId;
+            }, 10);
+        }
+        
+        // Tab switching functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Handle main tabs
+                if (this.hasAttribute('data-tab')) {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Remove active class from all tabs and contents
+                    document.querySelectorAll('.tab[data-tab]').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    this.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                }
+                
+                // Handle subtabs
+                if (this.hasAttribute('data-subtab')) {
+                    const subtabId = this.getAttribute('data-subtab');
+                    
+                    // Remove active class from all subtabs and contents
+                    document.querySelectorAll('.tab[data-subtab]').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('#my-info .tab-content').forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked subtab and corresponding content
+                    this.classList.add('active');
+                    document.getElementById(subtabId).classList.add('active');
+                }
+            });
+        });
+        
+        // Form submissions with fetch API
+        document.getElementById('update-details-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const detailsSpinner = document.getElementById('details-spinner');
+            const submitButton = document.getElementById('update-details-btn');
+            
+            // Show loading spinner and disable button
+            detailsSpinner.style.display = 'inline-block';
+            submitButton.disabled = true;
+            
+            fetch('/api/v1/user/update-details', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(Object.fromEntries(formData))
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide loading spinner and enable button
+                detailsSpinner.style.display = 'none';
+                submitButton.disabled = false;
+                
+                // Fixed condition: Check for message containing "success" instead of just data.success
+                if (data.success || (data.message && data.message.toLowerCase().includes('success'))) {
+                    showNotification('Profile details updated successfully!', 'success');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showNotification('Error updating profile: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                // Hide loading spinner and enable button
+                detailsSpinner.style.display = 'none';
+                submitButton.disabled = false;
+                
+                console.error('Error:', error);
+                showNotification('An error occurred while updating profile details.', 'error');
+            });
+        });
+        
+        document.getElementById('update-password-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const passwordSpinner = document.getElementById('password-spinner');
+            const submitButton = document.getElementById('update-password-btn');
+            
+            if (formData.get('newPassword') !== formData.get('confirmPassword')) {
+                showNotification('New passwords do not match!', 'error');
+                return;
+            }
+            
+            // Show loading spinner and disable button
+            passwordSpinner.style.display = 'inline-block';
+            submitButton.disabled = true;
+            
+            fetch('/api/v1/user/update-password', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    oldPassword: formData.get('oldPassword'),
+                    newPassword: formData.get('newPassword'),
+                    confirmPassword: formData.get('confirmPassword')
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide loading spinner and enable button
+                passwordSpinner.style.display = 'none';
+                submitButton.disabled = false;
+                
+                if (data.success || (data.message && data.message.toLowerCase().includes('success'))) {
+                    showNotification('Password updated successfully!', 'success');
+                    this.reset();
+                } else {
+                    showNotification('Error updating password: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                // Hide loading spinner and enable button
+                passwordSpinner.style.display = 'none';
+                submitButton.disabled = false;
+                
+                console.error('Error:', error);
+                showNotification('An error occurred while updating password.', 'error');
+            });
+        });
+        
+        document.getElementById('update-profilepic-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const picSpinner = document.getElementById('pic-spinner');
+            const submitButton = document.getElementById('update-pic-btn');
+            
+            // Show loading spinner and disable button
+            picSpinner.style.display = 'inline-block';
+            submitButton.disabled = true;
+            
+            fetch('/api/v1/user/update-profilepic', {
+                method: 'PATCH',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide loading spinner and enable button
+                picSpinner.style.display = 'none';
+                submitButton.disabled = false;
+                
+                if (data.success || (data.message && data.message.toLowerCase().includes('success'))) {
+                    showNotification('Profile picture updated successfully!', 'success');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showNotification('Error updating profile picture: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                // Hide loading spinner and enable button
+                picSpinner.style.display = 'none';
+                submitButton.disabled = false;
+                
+                console.error('Error:', error);
+                showNotification('An error occurred while updating profile picture.', 'error');
+            });
+        });
+        
+        // Profile picture preview
+        document.getElementById('profilepic').addEventListener('change', function(e) {
+            const preview = document.getElementById('preview');
+            const file = this.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Update listing modal functions
+        const updateModal = document.getElementById('updateListingModal');
+        const closeUpdateModalBtn = document.getElementById('closeUpdateModal');
+        const cancelUpdateBtn = document.getElementById('cancelUpdateBtn');
+        const updateListingForm = document.getElementById('updateListingForm');
+        
+        // Show modal when update button is clicked
+        document.querySelectorAll('.btn-update-listing').forEach(button => {
+            button.addEventListener('click', function() {
+                const listingId = this.getAttribute('data-id');
+                const title = this.getAttribute('data-title');
+                const description = this.getAttribute('data-description');
+                const price = this.getAttribute('data-price');
+                const category = this.getAttribute('data-category');
+                const location = this.getAttribute('data-location');
+                
+                // Fill the form with current listing data
+                document.getElementById('update-listing-id').value = listingId;
+                document.getElementById('update-title').value = title;
+                document.getElementById('update-description').value = description;
+                document.getElementById('update-price').value = price;
+                document.getElementById('update-category').value = category;
+                document.getElementById('update-location').value = location;
+                
+                // Show the modal
+                updateModal.style.display = 'block';
+            });
+        });
+        
+        // Close modal functions
+        closeUpdateModalBtn.addEventListener('click', () => {
+            updateModal.style.display = 'none';
+        });
+        
+        cancelUpdateBtn.addEventListener('click', () => {
+            updateModal.style.display = 'none';
+        });
+        
+        // Close modal if clicked outside of it
+        window.addEventListener('click', (event) => {
+            if (event.target === updateModal) {
+                updateModal.style.display = 'none';
+            }
+        });
+        
+        // Handle form submission for updating listing
+        updateListingForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const listingSpinner = document.getElementById('listing-spinner');
+            const submitButton = document.getElementById('update-listing-btn');
+            
+            // Show loading spinner and disable button
+            listingSpinner.style.display = 'inline-block';
+            submitButton.disabled = true;
+            
+            const listingId = document.getElementById('update-listing-id').value;
+            const formData = {
+                title: document.getElementById('update-title').value,
+                description: document.getElementById('update-description').value,
+                price: document.getElementById('update-price').value,
+                category: document.getElementById('update-category').value,
+                location: document.getElementById('update-location').value
+            };
+            
+            // Send PATCH request to update the listing
+            fetch(`/api/v1/listings/${listingId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide loading spinner and enable button
+                listingSpinner.style.display = 'none';
+                submitButton.disabled = false;
+                
+                if (data._id) {
+                    showNotification('Listing updated successfully!', 'success');
+                    updateModal.style.display = 'none';
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showNotification('Error updating listing: ' + (data.message || 'Unknown error'), 'error');
+                }
+            })
+            .catch(error => {
+                // Hide loading spinner and enable button
+                listingSpinner.style.display = 'none';
+                submitButton.disabled = false;
+                
+                console.error('Error:', error);
+                showNotification('An error occurred while updating the listing.', 'error');
+            });
+        });
+        
+        // Handle delete listing
+        document.querySelectorAll('.btn-delete-listing').forEach(button => {
+            button.addEventListener('click', function() {
+                const listingId = this.getAttribute('data-id');
+                const deleteButton = this;
+                
+                if (confirm('Are you sure you want to delete this listing? This action cannot be undone.')) {
+                    // Change button text to loading
+                    const originalText = deleteButton.textContent;
+                    deleteButton.textContent = 'Deleting...';
+                    deleteButton.disabled = true;
+                    
+                    // Send DELETE request to remove the listing
+                    fetch(`/api/v1/listings/${listingId}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(data => {
+                                throw new Error(data.message || 'Failed to delete listing');
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Restore button state
+                        deleteButton.textContent = originalText;
+                        deleteButton.disabled = false;
+                        
+                        if (data.message && data.message.includes('success')) {
+                            showNotification('Listing deleted successfully!', 'success');
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        } else {
+                            showNotification('Error deleting listing: ' + (data.message || 'Unknown error'), 'error');
+                        }
+                    })
+                    .catch(error => {
+                        // Restore button state
+                        deleteButton.textContent = originalText;
+                        deleteButton.disabled = false;
+                        
+                        console.error('Error:', error);
+                        
+                        // Display specific message for sold listings
+                        if (error.message.includes('Cannot delete a sold listing')) {
+                            showNotification('Cannot delete a sold listing. Sold listings are part of order history.', 'warning');
+                        } else {
+                            showNotification('An error occurred while deleting the listing: ' + error.message, 'error');
+                        }
+                    });
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Make tabs scrollable on mobile
+            const tabs = document.querySelector('.tabs');
+            if (tabs) {
+                // Add scroll indicators if tabs overflow
+                const checkOverflow = () => {
+                    if (tabs.scrollWidth > tabs.clientWidth) {
+                        tabs.classList.add('has-overflow');
+                    } else {
+                        tabs.classList.remove('has-overflow');
+                    }
+                };
+                
+                window.addEventListener('resize', checkOverflow);
+                checkOverflow();
+            }
+        });
+    </script>
+</body>
+</html>
