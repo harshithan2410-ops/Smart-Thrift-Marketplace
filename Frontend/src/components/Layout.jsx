@@ -94,7 +94,7 @@ const Layout = ({ children }) => {
                 <Leaf className="w-5 h-5" />
               </div>
               <span className="text-xl font-display font-bold text-foreground tracking-tight">
-                Thriftify
+                smart Thrift
               </span>
             </Link>
 
@@ -221,7 +221,7 @@ const Layout = ({ children }) => {
                 <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-white">
                   <Leaf className="w-4 h-4" />
                 </div>
-                <span className="text-lg font-display font-bold text-white">Thriftify</span>
+                <span className="text-lg font-display font-bold text-white">smart thrift</span>
               </div>
               <p className="text-sm max-w-sm leading-relaxed">
                 A sustainable marketplace for pre-loved items. Give your things a new life
@@ -247,7 +247,7 @@ const Layout = ({ children }) => {
           </div>
           <Separator className="my-8 bg-white/10" />
           <p className="text-xs text-white/40 text-center">
-            &copy; {new Date().getFullYear()} Thriftify. All rights reserved.
+            &copy; {new Date().getFullYear()} smart thrift. All rights reserved.
           </p>
         </div>
       </footer>
